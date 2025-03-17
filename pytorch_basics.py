@@ -397,6 +397,35 @@ train_dl = DataLoader(train_ds,
 """We can use the dataloader in a for loop. Let's look at an example""" 
 
 for xb, yb in train_dl:
-    print(xb)
-    print(yb) 
-    break 
+    #print(xb)
+    #print(yb) 
+    break  
+
+"""nn.Linear 
+Instead of initializing the weights & biases manually, we cans define the model using nn.Linear class from PyTorch, 
+which does it automatically 
+"""
+# Define model 
+model = nn.Linear(in_features=3, out_features=2) 
+#print(model.weight)
+#print(model.bias)
+
+"""PyTorch models also have a helpful .parameters method, which returns a list containing all the weight and bias matrices present in a model. 
+For our linear model, we have one weight matrix and one bias matrix""" 
+
+# Parameters
+list(model.parameters()) 
+
+"""We can use the model to generate predictions in the same ways as before"""
+preds = model(inputs) 
+print(preds) 
+
+"""Loss Function
+Instead of defining a loss function manually, we can use the buit-in loss function mse_loss"""
+# Import nn.function 
+import torch.nn.functional as F 
+loss_fn  = F.mse_loss
+
+"""Let's compute the loss for the current predictions"""
+loss = loss_fn(preds, targets)
+print(loss)
