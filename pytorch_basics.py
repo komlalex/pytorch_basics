@@ -289,7 +289,7 @@ with torch.no_grad():
 # With the new weights and biases, the model should have a lower loss 
 preds = model(inputs) 
 loss = mse(preds, targets) 
-print("loss: ", loss) 
+#print("loss 1: ", loss) 
 
 """Train for multiple epocs 
 
@@ -314,10 +314,89 @@ for i in range(120):
 # Calculate loss 
 preds = model(inputs)
 loss = mse(preds, targets) 
-print("loss: ", loss)  
+#print("loss 2: ", loss)  
 
 """The loss is significatly lower than its initial value. Let's look at the models 
 predictions and compare them with the targets"""
 preds = model(inputs) 
-print(preds) 
-print(targets)
+#print(preds) 
+#print(targets) 
+
+"""LINEAR REGRESSION USING PYTORCH BUILT-INS
+We've implemented linear regression & gradient descent model using some basic tensor operations. However, 
+since this is a common pattern in deep learning, PyTorch provides several built-in functions and classes 
+to make it easy to create and train models with just a few lines of code.
+
+Let's begin by importing the torch.nn package from PyTorch, which contains utility classes for building neural networks.
+"""
+import torch.nn as nn 
+
+"""As before we represent the inputs and targets as matrices""" 
+# Input (temp, rainfall, humidity)
+inputs = np.array([[73, 67, 43], 
+                   [91, 88, 64], 
+                   [87, 134, 58], 
+                   [102, 43, 37], 
+                   [69, 96, 70], 
+                   [74, 66, 43], 
+                   [91, 87, 65], 
+                   [88, 134, 59], 
+                   [101, 44, 37], 
+                   [68, 96, 71], 
+                   [73, 66, 44], 
+                   [92, 87, 64], 
+                   [87, 135, 57], 
+                   [103, 43, 36], 
+                   [68, 97, 70]], dtype="float32") 
+
+# Targets (apples, oranges) 
+targets = np.array([[56, 70], 
+                    [81, 101], 
+                    [119, 133], 
+                    [22, 37], 
+                    [103, 119], 
+                    [57, 69], 
+                    [80, 102], 
+                    [118, 132], 
+                    [21, 38], 
+                    [104, 118], 
+                    [57, 69], 
+                    [82, 100],
+                    [118, 134], 
+                    [20, 38], 
+                    [102, 120]], dtype="float32") 
+
+
+inputs = torch.from_numpy(inputs)
+targets = torch.from_numpy(targets) 
+
+"""We are using 15 training examples to illustrate how to work with large datasets in small batches"""
+"""Dataset and DataLoader 
+We'll create a TensorDataset, which allows access to rows from inputs and targets
+as tuples, and provides standard APIs for working with many different types of datasets in PyTorch
+"""
+from torch.utils.data import TensorDataset
+
+# Define dtaset 
+train_ds = TensorDataset(inputs, targets) 
+#print(train_ds[0:3])
+
+"""TensorDataset allows  us to access a small section of the training data using the array notation ([0:3])
+in the above code. It returns a tuple with two elements. The first element contains the input varaibles for the selected rows, and the second contains the targets 
+
+We'll also create a DataLoader, which can split the data into batches of a predefined size while training. It also provides other utilities like 
+shuffling and random sampling of data"""
+
+from torch.utils.data import DataLoader 
+
+# define data loader 
+BATCH_SIZE = 5 
+train_dl = DataLoader(train_ds, 
+                      batch_size=BATCH_SIZE, 
+                      shuffle=True) 
+"""We can use the dataloader in a for loop. Let's look at an example""" 
+
+for xb, yb in train_dl:
+    print(xb)
+    print(yb) 
+    break 
