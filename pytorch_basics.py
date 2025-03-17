@@ -483,4 +483,12 @@ fit(num_epochs=100,
     opt=opt, 
     train_dl=train_dl) 
 
+"""Let's make predictions with our model""" 
+preds = model(inputs) 
 
+# Compare with the targets
+#print(preds)
+#print(targets)
+
+pred = model(torch.tensor([75, 63, 44.]))
+print(pred)
