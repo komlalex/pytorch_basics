@@ -418,7 +418,6 @@ list(model.parameters())
 
 """We can use the model to generate predictions in the same ways as before"""
 preds = model(inputs) 
-print(preds) 
 
 """Loss Function
 Instead of defining a loss function manually, we can use the buit-in loss function mse_loss"""
@@ -428,4 +427,60 @@ loss_fn  = F.mse_loss
 
 """Let's compute the loss for the current predictions"""
 loss = loss_fn(preds, targets)
-print(loss)
+
+"""Optimizer 
+Instead of manually manipulating the model's weights & biases using gradients, we can use the optimizer optim.SGD. SGD is short 
+for stochastic gradient descent. The term stochastic indicates the samples are selected in random batches instead instead of as a single group."""
+
+# Define optimizer 
+opt = torch.optim.SGD(params=model.parameters(), lr=1e-5) 
+
+"""Note that model.parameters() is passed as an argument to optim.SGD so that the optimizer knows which matrices should be 
+modified during the update step. Also, we can specify a learning rate that controls the amount by which the parameters are modified."""
+
+"""Train the model 
+We are now ready to train the model. We'll follow the same process to implement gradient descent:
+1. Generate predictions 
+2. Calculate the loss 
+3. Compute the gradients w.r.t the weights and biases 
+4. Adjust the weights and biases by subtracting a small quatity proportional to the graduient
+5. Reset the gradients to zero 
+
+The only change is that we'll work with batches instead of processing the entire training data in every iteration. Let's define
+a utility function fit that trains the model for a given number of epochs
+"""
+
+# Uitlity function to train the model 
+def fit(num_epochs, model, loss_fn, opt: torch.optim.Optimizer, train_dl): 
+
+    # repeat for a given number of epochs 
+    for epoch in range(num_epochs): 
+
+        # Train with batches of data 
+        for xb, yb in train_dl: 
+
+            # 1. Generate predictions 
+            pred = model(xb) 
+
+            # 2. Calaculate the loss
+            loss = loss_fn(pred, yb)
+
+            # 3. Compute the gradient 
+            loss.backward() 
+
+            # 4. Update parameters using gradients 
+            opt.step() 
+
+            # 5. Reset the gradients to zero 
+            opt.zero_grad()
+        # Print the progress 
+        if (epoch + 1) % 10 == 0: 
+            print(f"Epoch: {epoch + 1}/{num_epochs} | Loss: {loss:.4f}") 
+
+fit(num_epochs=100, 
+    model=model, 
+    loss_fn=loss_fn, 
+    opt=opt, 
+    train_dl=train_dl) 
+
+
