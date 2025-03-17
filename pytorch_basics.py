@@ -194,7 +194,7 @@ torch.sum returns the sum of all the elements in a tensor
 torch.numel returns the number of elements in a tensors
 """
 loss = mse(preds, targets)
-print(loss)  
+#print(loss)  
 
 """
 Here's how we can interpret the result: On average, each element in the prediction differs from the 
@@ -255,4 +255,69 @@ may lead to unexpected results"""
 
 w.grad.zero_()
 b.grad.zero_() 
-print(w.grad)
+#print(w.grad) 
+
+"""TRAIN THE MODEL USING GRADIENT DESCENT 
+
+As seen above, we reduce the loss and improve our model using the gradient descent optimization 
+algorithm using the following steps: 
+1. Generate predictionsd 
+2. Calculate the loss 
+3. Compute the gradients w.r.t the weights and biases 
+4. Adjust the weights by subtracting a small quantity proportional to the gradients
+5. Reset the gradients to zero 
+
+Let's implement the above step by step 
+""" 
+# Generate predictions 
+preds = model(inputs) 
+
+# Calcuate the loss 
+loss = mse(preds, targets) 
+
+# Compute the gradients 
+loss.backward() 
+
+# Adjust the weights & reset the gradients 
+
+with torch.no_grad(): 
+    w -= w.grad * 1e-5
+    b -= b.grad * 1e-5 
+    w.grad.zero_()
+    b.grad.zero_() 
+
+# With the new weights and biases, the model should have a lower loss 
+preds = model(inputs) 
+loss = mse(preds, targets) 
+print("loss: ", loss) 
+
+"""Train for multiple epocs 
+
+To reduce the loss further, we can repeat the process of adjusting the weights and biases using the gradients 
+multiple times. Each iteration is called an epoch. Let's train the model for 100 epochs
+"""
+
+# Train for 100 epochs
+for i in range(120): 
+    preds = model(inputs) 
+    loss = mse(preds, targets) 
+    loss.backward() 
+
+    with torch.no_grad():
+        w -= w.grad * 1e-5 
+        b -= b.grad * 1e-5 
+        w.grad.zero_()
+        b.grad.zero_() 
+
+"""Once again, let's verify that the loss is now lower: """
+
+# Calculate loss 
+preds = model(inputs)
+loss = mse(preds, targets) 
+print("loss: ", loss)  
+
+"""The loss is significatly lower than its initial value. Let's look at the models 
+predictions and compare them with the targets"""
+preds = model(inputs) 
+print(preds) 
+print(targets)
