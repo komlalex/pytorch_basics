@@ -56,7 +56,6 @@ x = torch.tensor(3.)
 w = torch.tensor(4., requires_grad=True)
 b = torch.tensor(5., requires_grad=True)
 
-print(x, w, b)
 
 # Arithmetic operations 
 y = w * x + b 
@@ -72,6 +71,127 @@ print(y.backward())
 """The derivatives of y with respect to the input tensors are stored in the .grad property of the respective tensors"""
 
 # Display gradients
-print("dy/dx", x.grad) 
-print("dy/dw", w.grad)
-print("dy/db", b.grad)
+#print("dy/dx", x.grad) 
+#print("dy/dw", w.grad)
+#print("dy/db", b.grad)
+
+
+"""TENSOR FUNCTIONS
+Apart from arithmetic operations, the torch module also contains many functions 
+for creating and manipulating tensors. Let's look at some examples
+""" 
+
+# Create a tensor with a fixed value for every element 
+t6 = torch.full((3, 2), 42)
+
+# Concatenate two tensors with compatible shapes 
+t7 = torch.cat((t3, t6))
+
+
+# Compute the sin of each element 
+t8 = torch.sin(t7)
+
+# Change the shape of a tensor 
+t9 = t8.reshape(3, 2, 2)
+
+
+
+"""Interoperability with Numpy
+Numpy is a popular open-source library used for mathematical and scientific operations
+computing in Python. It enables efficient operations on large multi-dimensional
+arrays and has a vast ecosystem of supporting libraries, including;
+* Pandas for I/O and data analysis
+* Matplotlib for plotting and visualization
+* OpenCV for image and video processing
+"""
+
+# Here's how to create  an array in Numpy 
+import numpy as np
+x = np.array([[1, 2], [3, 4.]]) 
+
+# We convert a Numpy array to PyTorch tensor using torch.from_numpy
+y = torch.from_numpy(x) 
+#print(x.dtype, y.dtype)
+
+# We can convert a PyTorch tensor to a numpy array using the .numpy method of a tensor
+z = y.numpy() 
+
+
+"""A LINEAR REGRESSION MODEL FROM SCRATCH"""
+
+"""training data 
+We can represent the training data using two matrices: inputs and targets, each with one row per 
+observation, and each column per variable
+"""
+# Input (temp, rainfall, humidity)
+inputs = np.array([[73, 67, 43], 
+                   [91, 88, 64], 
+                   [87, 134, 58], 
+                   [102, 43, 37], 
+                   [69, 96, 70]], dtype="float32") 
+
+# Targets (apples, oranges) 
+targets = np.array([[56, 70], 
+                    [81, 101], 
+                    [119, 133], 
+                    [22, 37], 
+                    [103, 119]], dtype="float32") 
+
+# Convert inputs and targets to tensors 
+inputs = torch.from_numpy(inputs)
+targets = torch.from_numpy(targets) 
+
+""""LINEAR REGRESSION MODEL FROM SCRATCH 
+The weightd and biases can also be represented as matrices, initialized as random
+values. The first row of w and the first element of b are used to predict the first 
+target variable i.e. yield of apples, and similarly, the second for oranges
+"""
+
+# Weights and biases 
+w = torch.randn(2, 3, requires_grad=True)
+b = torch.randn(2, requires_grad=True) 
+#print(b)
+
+"""torch.randn creates a tensor with the given shape, with elements picked randomly fron normal 
+distribution with mean 0 and standard deviation 1. 
+Our model is simply a function that performs a matrix multiplication of the inputs and 
+weights and weigths w (transposed) and adds the bias b (replicated for each observation)""" 
+
+#print(inputs @ w.t() + b) 
+# We define the model as follows 
+def model(x): 
+    return x @ w.t() + b   
+
+preds  = model(inputs) 
+
+"""@ represents matrix multiplication in PyTorch, and the .t returns the transpose of a tensor.
+The matrix obtained by passing the input data into the model is a set of predictions for the target variables"""
+
+# Compare predictions with targets 
+#print(preds) 
+#print(targets)
+
+"""You can see a big difference between our model's predictions and the actual targets because we've 
+initialized our model with random weights and biases. Obviously, we can't expect a randomly initialized model to work""" 
+diff = preds - targets
+loss = torch.sum(diff * diff) / diff.numel() 
+print(loss)
+
+"""LOSS FUNCTION 
+Before we improve our model, we need to evaluate how well our model is performing. We can compare
+ the model's predictions with the actual targets using the following methods
+ * Calculate the difference between the two matrices (preds and targets)
+ * Square all the elements of the difference matrix to remove negative values
+ * Calculate the average of the elements in the resulting matrix.
+
+ The result is single number known as the mean square error (MSE)
+"""
+def mse(t1, t2): 
+    diff = t1 - t2 
+    return torch.sum(diff * diff) / diff.numel() 
+"""
+torch.sum returns the sum of all the elements in a tensor
+torch.numel returns the number of elements in a tensors
+"""
+loss = mse(preds, targets)
+print(loss)
