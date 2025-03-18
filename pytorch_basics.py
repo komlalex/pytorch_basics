@@ -490,5 +490,22 @@ preds = model(inputs)
 #print(preds)
 #print(targets)
 
-pred = model(torch.tensor([75, 63, 44.]))
-print(pred)
+pred = model(torch.tensor([[75, 63, 44.]]))
+print(pred) 
+
+"""Feed Forward Neural Networks"""
+
+model2 = nn.Sequential(
+    nn.Linear(3, 3), 
+    nn.Sigmoid(), 
+    nn.Linear(3, 2)
+)
+
+opt = torch.optim.SGD(params=model2.parameters(), lr=1e-2) 
+
+fit(num_epochs=100, 
+    model=model2, 
+    opt=opt, 
+    loss_fn=loss_fn, 
+    train_dl=train_dl
+    )
